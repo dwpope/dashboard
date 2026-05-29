@@ -3,442 +3,347 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Aware Dashboard</title>
+<title>Dave's Life Dashboard</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
     --bg:#0d1117;--card:#161b22;--border:#30363d;
     --text:#e6edf3;--text-dim:#8b949e;
     --green:#3fb950;--amber:#d29922;--red:#f85149;--accent:#58a6ff;
+    --purple:#bc8cff;
     --radius:12px;
   }
   html{font-size:16px;-webkit-text-size-adjust:100%}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
     background:var(--bg);color:var(--text);
-    line-height:1.55;
-    padding:16px;padding-top:max(16px,env(safe-area-inset-top));
-    padding-bottom:80px;
-    max-width:640px;margin:0 auto;
+    line-height:1.55;padding:16px;
+    padding-top:max(16px,env(safe-area-inset-top));
+    padding-bottom:80px;max-width:640px;margin:0 auto;
     -webkit-font-smoothing:antialiased;
   }
 
-  /* -- Header -- */
   .header{text-align:center;padding:28px 0 8px}
-  .header h1{font-size:1.6rem;font-weight:700;letter-spacing:-.02em}
-  .header .updated{font-size:.78rem;color:var(--text-dim);margin-top:4px}
+  .header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+  .header .sub{font-size:.75rem;color:var(--text-dim);margin-top:4px}
 
-  /* -- Stat tiles -- */
-  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+  /* Pillar tabs */
+  .pillar-nav{display:flex;gap:6px;margin:18px 0 14px;justify-content:center}
+  .pillar-tab{
+    padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:600;
+    cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);
+    transition:all .2s ease;-webkit-tap-highlight-color:transparent;
+  }
+  .pillar-tab.active{color:var(--text);border-color:var(--accent);background:rgba(88,166,255,.1)}
+  .pillar-tab:active{transform:scale(.96)}
+
+  .pillar{display:none}
+  .pillar.active{display:block}
+
+  /* Tiles */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+  .tiles.triple{grid-template-columns:1fr 1fr 1fr}
   .tile{
     background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
     padding:14px 16px;text-align:center;
-    transition:transform .15s ease,border-color .15s ease;
   }
-  .tile:active{transform:scale(.97)}
-  .tile .num{font-size:1.55rem;font-weight:700;line-height:1.2}
-  .tile .label{font-size:.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .tile .num{font-size:1.4rem;font-weight:700;line-height:1.2}
+  .tile .label{font-size:.68rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
   .tile.green .num{color:var(--green)}
   .tile.amber .num{color:var(--amber)}
+  .tile.red .num{color:var(--red)}
   .tile.accent .num{color:var(--accent)}
 
-  /* -- Cards (native <details>/<summary>) -- */
+  /* Cards */
   details.card{
     background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
     margin-bottom:12px;overflow:hidden;
-    transition:border-color .2s ease;
   }
-  details.card:hover,details.card:active{border-color:#484f58}
-
   details.card>summary{
     display:flex;align-items:center;justify-content:space-between;
     padding:14px 16px;cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-user-select:none;user-select:none;
-    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;user-select:none;
     list-style:none;
   }
   details.card>summary::-webkit-details-marker{display:none}
   details.card>summary::marker{display:none;content:""}
-
-  details.card>summary h2{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:8px}
+  details.card>summary h2{font-size:.92rem;font-weight:600;display:flex;align-items:center;gap:8px}
   details.card>summary .arrow{
-    font-size:.7rem;color:var(--text-dim);
-    display:inline-block;
-    transition:transform .25s ease;
-    -webkit-transition:-webkit-transform .25s ease;
-    -webkit-transform:rotate(-90deg);transform:rotate(-90deg);
+    font-size:.7rem;color:var(--text-dim);display:inline-block;
+    transition:transform .25s ease;transform:rotate(-90deg);
   }
-  details.card[open]>summary .arrow{
-    -webkit-transform:rotate(0deg);transform:rotate(0deg);
-  }
+  details.card[open]>summary .arrow{transform:rotate(0deg)}
 
-  /* Animate card body open/close */
-  details.card .card-body{
-    padding:0 16px 16px;overflow:hidden;
-  }
-  details.card .card-inner{
-    animation:cardOpen .3s ease forwards;
-  }
-  @keyframes cardOpen{
-    from{opacity:0;transform:translateY(-8px)}
-    to{opacity:1;transform:translateY(0)}
-  }
+  .card-body{padding:0 16px 16px}
+  .card-inner{animation:cardOpen .3s ease forwards}
+  @keyframes cardOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-  /* -- Status dots -- */
-  .dot{
-    width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;
-  }
+  /* Dots */
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
   .dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
   .dot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber)}
   .dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
   .dot.pulse{animation:pulse 2s ease-in-out infinite}
 
-  /* -- SVG charts -- */
-  svg.chart{display:block;width:100%;height:auto;margin:10px 0}
-  .chart-label{font-size:.7rem;color:var(--text-dim);margin-bottom:2px}
-
-  /* -- Data rows -- */
-  .row{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:8px 0;border-bottom:1px solid var(--border);
-    font-size:.85rem;
-  }
+  /* Rows */
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.85rem}
   .row:last-child{border-bottom:none}
   .row .key{color:var(--text-dim)}
   .row .val{font-weight:600;text-align:right}
 
-  /* -- News items (nested <details>/<summary>) -- */
-  details.news-item{
-    padding:10px 0;border-bottom:1px solid var(--border);
-  }
-  details.news-item:last-child{border-bottom:none}
-
-  details.news-item>summary{
-    font-size:.88rem;font-weight:500;
-    display:flex;align-items:center;gap:6px;
-    cursor:pointer;list-style:none;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-user-select:none;user-select:none;
-    touch-action:manipulation;
-  }
-  details.news-item>summary::-webkit-details-marker{display:none}
-  details.news-item>summary::marker{display:none;content:""}
-
-  details.news-item>summary .arrow-sm{
-    font-size:.6rem;color:var(--text-dim);
-    display:inline-block;
-    transition:transform .2s ease;
-    -webkit-transition:-webkit-transform .2s ease;
-  }
-  details.news-item[open]>summary .arrow-sm{
-    -webkit-transform:rotate(90deg);transform:rotate(90deg);
-  }
-
-  details.news-item .detail{
-    font-size:.8rem;color:var(--text-dim);
-    margin-top:6px;line-height:1.5;
-    animation:newsOpen .25s ease forwards;
-  }
-  @keyframes newsOpen{
-    from{opacity:0}
-    to{opacity:1}
-  }
-
-  /* -- Price alerts -- */
-  .price-row{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem;
-  }
-  .price-row:last-child{border-bottom:none}
-  .price-row .name{font-weight:500}
-  .tag{
-    font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:600;
-    text-transform:uppercase;letter-spacing:.03em;
-  }
+  /* Tags */
+  .tag{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
   .tag.red{background:rgba(248,81,73,.15);color:var(--red)}
   .tag.green{background:rgba(63,185,80,.15);color:var(--green)}
   .tag.amber{background:rgba(210,153,34,.15);color:var(--amber)}
+  .tag.accent{background:rgba(88,166,255,.12);color:var(--accent)}
 
-  /* -- Quick action buttons -- */
-  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-  .btn{
-    display:inline-block;padding:10px 18px;
-    background:rgba(88,166,255,.12);color:var(--accent);
-    border:1px solid rgba(88,166,255,.25);border-radius:8px;
-    font-size:.82rem;font-weight:600;text-decoration:none;
-    transition:background .15s ease,transform .1s ease;
-    -webkit-tap-highlight-color:transparent;
+  /* Charts */
+  svg.chart{display:block;width:100%;height:auto;margin:10px 0}
+  .chart-label{font-size:.7rem;color:var(--text-dim);margin-bottom:2px}
+
+  /* Progress bar */
+  .progress-track{height:6px;background:var(--border);border-radius:3px;margin:8px 0}
+  .progress-fill{height:100%;border-radius:3px;background:var(--green);transition:width .3s ease}
+
+  /* Action items */
+  .action-item{
+    padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem;
   }
-  .btn:active{transform:scale(.96);background:rgba(88,166,255,.2)}
+  .action-item:last-child{border-bottom:none}
+  .action-item .source{font-size:.7rem;color:var(--text-dim);margin-top:2px}
 
-  /* -- Misc -- */
-  a{color:var(--accent);text-decoration:none}
   .sub{font-size:.78rem;color:var(--text-dim);margin-top:6px;line-height:1.5}
-  .badge{
-    font-size:.7rem;padding:2px 8px;border-radius:20px;font-weight:600;
-    background:rgba(63,185,80,.15);color:var(--green);
-    display:inline-block;margin-left:6px;
-  }
+  a{color:var(--accent);text-decoration:none}
+
+  /* Empty state */
+  .empty{text-align:center;padding:20px;color:var(--text-dim);font-size:.85rem}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Aware Dashboard</h1>
-  <div class="updated">Last updated: May 26, 2026 &middot; 09:00 AM</div>
+  <h1>Life Dashboard</h1>
+  <div class="sub">May 29, 2026 · 06:29 PM</div>
 </div>
 
-<!-- -- Summary Tiles -- -->
-<div class="tiles">
-  <div class="tile green">
-    <div class="num">750</div>
-    <div class="label">Tests Passing</div>
-  </div>
-  <div class="tile accent">
-    <div class="num">42</div>
-    <div class="label">Commits (30d)</div>
-  </div>
-  <div class="tile amber">
-    <div class="num">9</div>
-    <div class="label">Days Idle</div>
-  </div>
-  <div class="tile green">
-    <div class="num">Build 2</div>
-    <div class="label">TestFlight</div>
-  </div>
+<!-- Pillar Navigation -->
+<div class="pillar-nav">
+  <div class="pillar-tab active" onclick="showPillar('build')">Build</div>
+  <div class="pillar-tab" onclick="showPillar('move')">Move</div>
+  <div class="pillar-tab" onclick="showPillar('thrive')">Thrive</div>
 </div>
 
-<!-- -- Aware App -- -->
-<details class="card" open>
-  <summary>
-    <h2><span class="dot green pulse"></span> Aware App</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <div class="chart-label">Test Growth (last 9 weeks)</div>
-      <svg class="chart" id="sparkline" viewBox="0 0 300 80" preserveAspectRatio="none"></svg>
+<!-- ════════════════════════════════════════════ -->
+<!-- BUILD PILLAR                                 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="pillar active" id="pillar-build">
 
-      <div class="chart-label" style="margin-top:14px">Weekly Commits</div>
-      <svg class="chart" id="barchart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-
-      <div class="row"><span class="key">Latest Commit</span><span class="val" style="font-family:monospace;font-size:.8rem">60490fb</span></div>
-      <div class="row"><span class="key">Days Since Commit</span><span class="val" style="color:var(--amber)">9</span></div>
-      <div class="row"><span class="key">Files</span><span class="val">256</span></div>
-      <div class="row"><span class="key">Lines of Code</span><span class="val">45K</span></div>
-      <div class="row"><span class="key">CI Status</span><span class="val"><span class="dot green pulse" style="margin-right:5px"></span>Passing</span></div>
-      <div class="row"><span class="key">TestFlight</span><span class="val">Build 2 <span class="badge">LIVE</span></span></div>
+  <div class="tiles">
+    <div class="tile red">
+      <div class="num">10</div>
+      <div class="label">Days Idle</div>
+    </div>
+    <div class="tile amber">
+      <div class="num">✗</div>
+      <div class="label">Demo Video</div>
     </div>
   </div>
-</details>
 
-<!-- -- AI News -- -->
-<details class="card">
-  <summary>
-    <h2>AI News &middot; May 26</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <details class="news-item">
-        <summary><span class="arrow-sm">&#9654;</span> Figma AI Agent Launched</summary>
-        <div class="detail">Figma ships an AI agent that can generate and edit designs from natural language prompts, directly inside the canvas.</div>
-      </details>
-      <details class="news-item">
-        <summary><span class="arrow-sm">&#9654;</span> SAP Autonomous Enterprise</summary>
-        <div class="detail">SAP announces its "Autonomous Enterprise" vision with AI agents handling procurement, HR, and finance workflows end-to-end.</div>
-      </details>
-      <details class="news-item">
-        <summary><span class="arrow-sm">&#9654;</span> Smart Glasses Outsell Headsets 3:1</summary>
-        <div class="detail">Q1 2026 data shows smart glasses outselling VR/MR headsets three-to-one globally, led by Meta and Xreal.</div>
-      </details>
-      <details class="news-item">
-        <summary><span class="arrow-sm">&#9654;</span> Meta Quest 4 Delayed</summary>
-        <div class="detail">Meta pushes Quest 4 launch to 2027, citing supply chain constraints and a strategic pivot toward neural interface R&amp;D.</div>
-      </details>
+  <!-- Quant/Aware -->
+  <details class="card" open>
+    <summary>
+      <h2><span class="dot red pulse"></span> Quant · Aware</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      <div class="row"><span class="key">Next Milestone</span><span class="val">Surface analytics UI in the app</span></div>
+      <div class="row"><span class="key">Days Since Progress</span><span class="val" style="color:var(--red)">10</span></div>
+      <div class="row"><span class="key">Demo Video</span><span class="val"><span class="tag amber">Pending</span></span></div>
+      
+      <div class="row"><span class="key">CI Status</span><span class="val">unknown</span></div>
+      
+    </div></div>
+  </details>
+
+  <!-- Code Tutor -->
+  <details class="card">
+    <summary>
+      <h2><span class="dot green"></span> Code Tutor</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      <div class="row"><span class="key">Days Since Session</span><span class="val" style="color:var(--green)">0</span></div>
+      <div class="row"><span class="key">Weakest Area</span><span class="val">testing</span></div>
+      <div class="sub">Keep the streak alive — quiz yourself on the Quant codebase.</div>
+    </div></div>
+  </details>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- MOVE PILLAR                                  -->
+<!-- ════════════════════════════════════════════ -->
+<div class="pillar" id="pillar-move">
+
+  <div class="tiles">
+    <div class="tile accent">
+      <div class="num">0/10</div>
+      <div class="label">Outreach</div>
+    </div>
+    <div class="tile amber">
+      <div class="num">0</div>
+      <div class="label">Action Items</div>
     </div>
   </div>
-</details>
 
-<!-- -- Career -- -->
-<details class="card">
-  <summary>
-    <h2>Career</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <div class="chart-label" style="margin-bottom:6px">Spatial Roles Hiring</div>
-      <div class="row"><span class="key">Disney</span><span class="val" style="color:var(--green)">Open</span></div>
-      <div class="row"><span class="key">Meta</span><span class="val" style="color:var(--green)">Open</span></div>
-      <div class="row"><span class="key">Google</span><span class="val" style="color:var(--green)">Open</span></div>
-      <div class="row"><span class="key">Apple</span><span class="val" style="color:var(--green)">Open</span></div>
-      <div class="row"><span class="key">Snap</span><span class="val" style="color:var(--green)">Open</span></div>
-
-      <div style="margin-top:14px">
-        <div class="row">
-          <span class="key">LinkedIn Draft</span>
-          <span class="val"><span class="tag green">Ready</span></span>
-        </div>
-        <div class="sub">Angle: Anthropic finance agents &amp; what it means for spatial computing</div>
+  <!-- Outreach tracker -->
+  <details class="card" open>
+    <summary>
+      <h2>Outreach Progress</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      <div class="chart-label">0 of 10 connections made</div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:0%"></div>
       </div>
+      
+        <div class="sub">No connections logged yet. Start adding people to track progress.</div>
+      
+    </div></div>
+  </details>
 
-      <div style="margin-top:6px">
-        <div class="row">
-          <span class="key">Connection Draft</span>
-          <span class="val"><span class="tag green">Ready</span></span>
-        </div>
-        <div class="sub">Cheng Zhang (Cornell) &middot; Drafted May 20</div>
-      </div>
+  <!-- Career Intel -->
+  <details class="card" >
+    <summary>
+      <h2>Career Intel</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      
+        <div class="empty">No actionable intel this week. Check back Monday.</div>
+      
+    </div></div>
+  </details>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- THRIVE PILLAR                                -->
+<!-- ════════════════════════════════════════════ -->
+<div class="pillar" id="pillar-thrive">
+
+  <div class="tiles triple">
+    <div class="tile amber">
+      <div class="num">—</div>
+      <div class="label">Steps</div>
+    </div>
+    <div class="tile amber">
+      <div class="num">—</div>
+      <div class="label">Sleep (h)</div>
+    </div>
+    <div class="tile red">
+      <div class="num">0d</div>
+      <div class="label">Protein &#x1F525;</div>
     </div>
   </div>
-</details>
 
-<!-- -- Shopping -- -->
-<details class="card">
-  <summary>
-    <h2>Shopping</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <div class="price-row">
-        <div>
-          <div class="name">Pelikan M800</div>
-          <div class="sub" style="margin:0">&pound;515 &rarr; &pound;650</div>
-        </div>
-        <div><span class="tag red">Price Up</span></div>
+  <!-- Health Vitals -->
+  <details class="card" open>
+    <summary>
+      <h2>Health Vitals</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      <div class="row"><span class="key">Resting HR</span><span class="val">— bpm</span></div>
+      <div class="row"><span class="key">HRV</span><span class="val">— ms</span></div>
+      <div class="row"><span class="key">VO2max</span><span class="val">—</span></div>
+      
+      <div style="margin-top:10px">
+        <div class="chart-label">7-Day Averages</div>
+        <div class="row"><span class="key">Avg Steps</span><span class="val">—</span></div>
+        <div class="row"><span class="key">Avg Sleep</span><span class="val">—h</span></div>
       </div>
-      <div class="price-row">
-        <div>
-          <div class="name">Visconti Homo Sapiens</div>
-          <div class="sub" style="margin:0">&pound;654</div>
-        </div>
-        <div><span class="tag green">Stable</span></div>
-      </div>
-    </div>
-  </div>
-</details>
+    </div></div>
+  </details>
 
-<!-- -- Project Movement -- -->
-<details class="card">
-  <summary>
-    <h2>Project Movement</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <div class="row"><span class="key">Commits (30d)</span><span class="val" style="color:var(--accent)">42</span></div>
-      <div class="row"><span class="key">Analytics Trilogy</span><span class="val"><span class="tag green">Complete</span></span></div>
-      <div class="sub">Steady progress. Analytics trilogy shipped. Focus shifting to polish and TestFlight feedback.</div>
-    </div>
-  </div>
-</details>
+  <!-- Streaks -->
+  <details class="card">
+    <summary>
+      <h2>Streaks</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      <div class="row"><span class="key">7K+ Steps</span><span class="val">0d</span></div>
+      <div class="row"><span class="key">7h+ Sleep</span><span class="val">0d</span></div>
+      <div class="row"><span class="key">Workouts</span><span class="val">0d</span></div>
+      <div class="row"><span class="key">Protein All Meals</span><span class="val">0d</span></div>
+    </div></div>
+  </details>
 
-<!-- -- Quick Actions -- -->
-<details class="card" open>
-  <summary>
-    <h2>Quick Actions</h2>
-    <span class="arrow">&#9654;</span>
-  </summary>
-  <div class="card-body">
-    <div class="card-inner">
-      <div class="actions">
-        <a class="btn" href="#">Run Tests</a>
-        <a class="btn" href="#">Open Xcode</a>
-        <a class="btn" href="#">Check CI</a>
-        <a class="btn" href="#">LinkedIn Post</a>
-        <a class="btn" href="#">Job Scan</a>
-        <a class="btn" href="#">Price Check</a>
-      </div>
-    </div>
-  </div>
-</details>
+  <!-- Steps sparkline -->
+  
 
+  <!-- Family -->
+  <details class="card">
+    <summary>
+      <h2>Family</h2>
+      <span class="arrow">&#9654;</span>
+    </summary>
+    <div class="card-body"><div class="card-inner">
+      
+      
+      
+      
+      <div class="empty">Family data will appear once the check-in shortcut is used.</div>
+      
+    </div></div>
+  </details>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- JavaScript                                   -->
+<!-- ════════════════════════════════════════════ -->
 <script>
-// ======================================
-//  DATA -- replace these on regeneration
-// ======================================
-var testHistory = [350, 373, 392, 415, 460, 640, 683, 746, 750];
-var weeklyCommits = [0, 3, 8, 16, 6, 5, 2, 1, 1];
+function showPillar(id) {
+  document.querySelectorAll('.pillar').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pillar-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
 
-// -- Draw sparkline --
-(function drawSparkline() {
-  var svg = document.getElementById('sparkline');
-  var d = testHistory;
-  var w = 300, h = 80, pad = 6;
-  var min = Math.min.apply(null, d), max = Math.max.apply(null, d);
-  var range = max - min || 1;
-  var pts = [];
-  for (var i = 0; i < d.length; i++) {
-    var x = pad + (i / (d.length - 1)) * (w - pad * 2);
-    var y = h - pad - ((d[i] - min) / range) * (h - pad * 2);
-    pts.push(x + ',' + y);
+// Sparkline renderer
+function drawSparkline(svgId, data, color) {
+  var svg = document.getElementById(svgId);
+  if (!svg || !data.length) return;
+  var w=300, h=80, pad=6;
+  var min=Math.min.apply(null,data), max=Math.max.apply(null,data);
+  var range=max-min||1;
+  var pts=[];
+  for(var i=0;i<data.length;i++){
+    var x=pad+(i/(data.length-1))*(w-pad*2);
+    var y=h-pad-((data[i]-min)/range)*(h-pad*2);
+    pts.push(x+','+y);
   }
-
-  var defs = '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0%" stop-color="#3fb950" stop-opacity="0.3"/>' +
-    '<stop offset="100%" stop-color="#3fb950" stop-opacity="0.02"/>' +
+  var defs='<defs><linearGradient id="sg-'+svgId+'" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="'+color+'" stop-opacity="0.3"/>'+
+    '<stop offset="100%" stop-color="'+color+'" stop-opacity="0.02"/>'+
     '</linearGradient></defs>';
-
-  var areaPath = 'M' + pts[0] + ' ' + pts.join(' L') +
-    ' L' + (pad + (w - pad * 2)) + ',' + (h - pad) +
-    ' L' + pad + ',' + (h - pad) + ' Z';
-
-  var linePath = 'M' + pts.join(' L');
-
-  var dots = '';
-  for (var j = 0; j < pts.length; j++) {
-    var c = pts[j].split(',');
-    var r = j === pts.length - 1 ? 3.5 : 2;
-    var op = j === pts.length - 1 ? 1 : 0.5;
-    dots += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + r + '" fill="#3fb950" opacity="' + op + '"/>';
+  var area='M'+pts[0]+' '+pts.join(' L')+
+    ' L'+(pad+(w-pad*2))+','+(h-pad)+' L'+pad+','+(h-pad)+' Z';
+  var line='M'+pts.join(' L');
+  var dots='';
+  for(var j=0;j<pts.length;j++){
+    var c=pts[j].split(',');
+    var r=j===pts.length-1?3.5:2;
+    dots+='<circle cx="'+c[0]+'" cy="'+c[1]+'" r="'+r+'" fill="'+color+'" opacity="'+(j===pts.length-1?1:0.5)+'"/>';
   }
+  svg.innerHTML=defs+'<path d="'+area+'" fill="url(#sg-'+svgId+')"/>'+
+    '<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2"/>'+dots;
+}
 
-  var lastPt = pts[pts.length - 1].split(',');
-  var label = '<text x="' + (parseFloat(lastPt[0]) - 4) + '" y="' + (parseFloat(lastPt[1]) - 8) + '" font-size="10" fill="#3fb950" font-weight="600" text-anchor="end">' + d[d.length - 1] + '</text>';
-
-  svg.innerHTML = defs +
-    '<path d="' + areaPath + '" fill="url(#sg)"/>' +
-    '<path d="' + linePath + '" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-    dots + label;
-})();
-
-// -- Draw bar chart --
-(function drawBars() {
-  var svg = document.getElementById('barchart');
-  var d = weeklyCommits;
-  var w = 300, h = 70, pad = 6;
-  var max = Math.max.apply(null, d) || 1;
-  var barW = (w - pad * 2) / d.length - 4;
-  var bars = '';
-
-  var defs = '<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0%" stop-color="#58a6ff"/>' +
-    '<stop offset="100%" stop-color="#58a6ff" stop-opacity="0.4"/>' +
-    '</linearGradient></defs>';
-
-  for (var i = 0; i < d.length; i++) {
-    var barH = Math.max(2, (d[i] / max) * (h - pad * 2 - 12));
-    var x = pad + i * ((w - pad * 2) / d.length) + 2;
-    var y = h - pad - barH;
-    bars += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="3" fill="url(#bg)" opacity="0.85"/>';
-    if (d[i] > 0) {
-      bars += '<text x="' + (x + barW / 2) + '" y="' + (y - 3) + '" font-size="8" fill="#8b949e" text-anchor="middle">' + d[i] + '</text>';
-    }
-  }
-
-  var weeks = ['W1','W2','W3','W4','W5','W6','W7','W8','W9'];
-  var labels = '';
-  for (var k = 0; k < weeks.length; k++) {
-    var lx = pad + k * ((w - pad * 2) / d.length) + 2 + barW / 2;
-    labels += '<text x="' + lx + '" y="' + (h - 1) + '" font-size="7" fill="#484f58" text-anchor="middle">' + weeks[k] + '</text>';
-  }
-
-  svg.innerHTML = defs + bars + labels;
-})();
+var stepsData = [];
+drawSparkline('steps-spark', stepsData, '#3fb950');
 </script>
 </body>
 </html>
