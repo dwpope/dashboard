@@ -473,19 +473,28 @@ def family_action(fam):
 
 
 def load_health():
-    rows = read_jsonl(CLAUDE / "health-history.jsonl")
-    if not rows:
-        return {"has_data": False}
-    last = rows[-1]
-    last7 = rows[-7:]
-    return {
-        "has_data": True,
-        "steps": last.get("steps", "—"),
-        "sleep_hours": last.get("sleep_hours", "—"),
-        "resting_hr": last.get("resting_hr", "—"),
-        "avg_steps": int(sum(d.get("steps", 0) for d in last7) / len(last7)),
-        "avg_sleep": round(sum(d.get("sleep_hours", 0) for d in last7) / len(last7), 1),
+    # Workouts come from the Body & Mind calendar (goal: 3x/week); steps/sleep/HR
+    # come from the Apple Watch iCloud Shortcut into health-history.jsonl.
+    cal = _load_json("health-calendar.json")
+    out = {
+        "has_data": False,
+        "workouts": cal.get("workouts_this_week"),   # None if calendar not synced
+        "goal": cal.get("weekly_goal", 3),
+        "steps": "—", "sleep_hours": "—", "resting_hr": "—",
+        "avg_steps": "—", "avg_sleep": "—",
     }
+    rows = read_jsonl(CLAUDE / "health-history.jsonl")
+    if rows:
+        last, last7 = rows[-1], rows[-7:]
+        out.update({
+            "has_data": True,
+            "steps": last.get("steps", "—"),
+            "sleep_hours": last.get("sleep_hours", "—"),
+            "resting_hr": last.get("resting_hr", "—"),
+            "avg_steps": int(sum(d.get("steps", 0) for d in last7) / len(last7)),
+            "avg_sleep": round(sum(d.get("sleep_hours", 0) for d in last7) / len(last7), 1),
+        })
+    return out
 
 
 # ── Next action: ONE thing, conversion-first ────────────────────────

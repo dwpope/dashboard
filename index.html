@@ -32,13 +32,24 @@
     border:.5px solid var(--separator);border-radius:var(--radius);
     padding:16px 14px 14px;margin:16px 0 14px;
   }
-  .hero .eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+  .hero .eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
   .hero-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-  .hero-cell{text-align:center;padding:6px 2px}
-  .hero-cell .n{font-size:1.6rem;font-weight:700;letter-spacing:-.04em;line-height:1}
-  .hero-cell .l{font-size:.66rem;color:var(--text-dim);margin-top:5px;font-weight:500;letter-spacing:0}
+  .hero-cell{text-align:center;padding:2px 2px}
+  .hero-cell .n{font-size:1.5rem;font-weight:700;letter-spacing:-.04em;line-height:1}
+  .hero-cell .l{font-size:.64rem;color:var(--text-dim);margin-top:5px;font-weight:500;letter-spacing:0}
   .hero-cell .n.on{color:var(--green)}
   .hero-cell .n.off{color:var(--text-dim)}
+  /* Per-pillar sections inside the hero */
+  .hero-sec{padding-top:13px;margin-top:13px;border-top:.5px solid var(--separator)}
+  .hero-sec.first{padding-top:0;margin-top:0;border-top:none}
+  .hero-seclabel{display:flex;align-items:center;justify-content:space-between;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .hero-seclabel .chev{color:var(--text-dim);font-weight:400;font-size:1rem}
+  .hero-seclabel.c{color:var(--teal)}.hero-seclabel.f{color:var(--purple)}.hero-seclabel.h{color:var(--green)}
+  .hero-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;font-size:.92rem;font-weight:550}
+  .hero-line .v{font-weight:650}
+  .hero-line .v.on{color:var(--green)}.hero-line .v.warn{color:var(--amber)}.hero-line .v.dim{color:var(--text-dim)}
+  .hero-line .sep{color:var(--separator);font-weight:400}
+  .hero-line .k{color:var(--text-dim);font-weight:400}
 
   /* ONE next action */
   .action{
@@ -116,18 +127,49 @@
 
 <div class="header">
   <h1>Conversion Dashboard</h1>
-  <div class="sub">May 30, 2026 · 04:07 PM</div>
+  <div class="sub">May 30, 2026 · 04:13 PM</div>
 </div>
 
-<!-- HERO: this week's conversion -->
+<!-- HERO: this week across all three pillars -->
 <div class="hero">
   <div class="eyebrow">This week · May 24 – May 30</div>
-  <div class="hero-grid">
-    <div class="hero-cell"><div class="n off">0</div><div class="l">Sent</div></div>
-    <div class="hero-cell"><div class="n off">0</div><div class="l">Applied</div></div>
-    <div class="hero-cell"><div class="n off">0</div><div class="l">Replies</div></div>
-    <div class="hero-cell"><div class="n off">0</div><div class="l">Published</div></div>
-    <div class="hero-cell"><div class="n off">0</div><div class="l">Demos</div></div>
+
+  <!-- Career -->
+  <div class="hero-sec first">
+    <div class="hero-seclabel c" onclick="showPillar('career')">Career <span class="chev">›</span></div>
+    <div class="hero-grid">
+      <div class="hero-cell"><div class="n off">0</div><div class="l">Sent</div></div>
+      <div class="hero-cell"><div class="n off">0</div><div class="l">Applied</div></div>
+      <div class="hero-cell"><div class="n off">0</div><div class="l">Replies</div></div>
+      <div class="hero-cell"><div class="n off">0</div><div class="l">Published</div></div>
+      <div class="hero-cell"><div class="n off">0</div><div class="l">Demos</div></div>
+    </div>
+  </div>
+
+  <!-- Family & friends -->
+  <div class="hero-sec">
+    <div class="hero-seclabel f" onclick="showPillar('family')">Family &amp; friends <span class="chev">›</span></div>
+    <div class="hero-line">
+      <span class="k">Presence</span>
+      <span class="v dim">—</span>
+      <span class="sep">·</span>
+      <span class="k">Date night</span>
+      <span class="v warn">10w ago</span>
+      <span class="sep">·</span><span class="v on">tonight ✓</span>
+    </div>
+  </div>
+
+  <!-- Health -->
+  <div class="hero-sec">
+    <div class="hero-seclabel h" onclick="showPillar('health')">Health <span class="chev">›</span></div>
+    <div class="hero-line">
+      <span class="k">Workouts</span>
+      <span class="v warn">0/3</span>
+      <span class="sep">·</span>
+      <span class="k">Sleep</span><span class="v dim">—</span>
+      <span class="sep">·</span>
+      <span class="k">Steps</span><span class="v dim">—</span>
+    </div>
   </div>
 </div>
 
@@ -139,9 +181,9 @@
 </div>
 
 <div class="pillar-nav">
-  <div class="pillar-tab active" onclick="showPillar(event,'career')">Career</div>
-  <div class="pillar-tab" onclick="showPillar(event,'family')">Family</div>
-  <div class="pillar-tab" onclick="showPillar(event,'health')">Health</div>
+  <div class="pillar-tab active" data-pillar="career" onclick="showPillar('career')">Career</div>
+  <div class="pillar-tab" data-pillar="family" onclick="showPillar('family')">Family</div>
+  <div class="pillar-tab" data-pillar="health" onclick="showPillar('health')">Health</div>
 </div>
 
 <!-- ════════ CAREER ════════ -->
@@ -340,18 +382,22 @@
     <div class="card-head"><h2><span class="dot green"></span> Health</h2></div>
     <div class="card-body">
       
-        <div class="cta">No health data flowing yet.<br>Set up the Apple Watch → iCloud Shortcut to write <code>health-history.jsonl</code>, and steps / sleep / HR land here automatically.</div>
+      <div class="row"><span class="key">Workouts this week</span><span class="val" style="color:var(--amber)">0 / 3</span></div>
+      
+      
+        <div class="cta">Steps, sleep & resting HR aren't flowing yet.<br>Set up the Apple Watch → iCloud Shortcut to write <code>health-history.jsonl</code> and they land here automatically. (Workouts above come from your Body &amp; Mind calendar.)</div>
       
     </div>
   </section>
 </div>
 
 <script>
-function showPillar(e,id){
+function showPillar(id){
   document.querySelectorAll('.pillar').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.pillar-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('pillar-'+id).classList.add('active');
-  e.currentTarget.classList.add('active');
+  document.querySelectorAll('.pillar-tab').forEach(t=>t.classList.toggle('active', t.dataset.pillar===id));
+  var nav=document.querySelector('.pillar-nav');
+  if(nav) window.scrollTo({top:nav.offsetTop-12,behavior:'smooth'});
 }
 </script>
 </body>
