@@ -121,13 +121,23 @@
   .listitem:last-child{border-bottom:none}
   .listitem .meta{font-size:.78rem;color:var(--text-dim);margin-top:3px}
   .cta{display:block;text-align:center;background:var(--card-2);border-radius:var(--radius-sm);padding:14px;font-size:.92rem;color:var(--text-dim);line-height:1.5}
+
+  /* Cadence history strips — a mirror, not a chain */
+  .trow{display:grid;grid-template-columns:74px 1fr;align-items:center;gap:10px;margin:8px 0}
+  .trow .tlabel{font-size:.84rem;color:var(--text-dim);font-weight:500}
+  .strip{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+  .sq{aspect-ratio:1;border-radius:3px;background:transparent;border:1px solid var(--separator)}
+  .sq.full{background:var(--green);border-color:transparent}
+  .sq.part{background:rgba(48,209,88,.4);border-color:transparent}
+  .strip-cap{display:grid;grid-template-columns:74px 1fr;gap:10px;margin-top:7px}
+  .strip-cap .sp{display:flex;justify-content:space-between;font-size:.68rem;color:var(--text-dim)}
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>Conversion Dashboard</h1>
-  <div class="sub">May 30, 2026 · 04:13 PM</div>
+  <div class="sub">May 30, 2026 · 04:27 PM</div>
 </div>
 
 <!-- HERO: this week across all three pillars -->
@@ -257,6 +267,36 @@
     </div>
   </section>
 
+  <!-- Cadence: 8-week history of controllable inputs (not a chain to defend) -->
+  <section class="card">
+    <div class="card-head"><h2>Cadence · last 8 weeks</h2></div>
+    <div class="card-body">
+      
+      <div class="trow">
+        <span class="tlabel">Sent</span>
+        <span class="strip"><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span></span>
+      </div>
+      
+      <div class="trow">
+        <span class="tlabel">Applied</span>
+        <span class="strip"><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span></span>
+      </div>
+      
+      <div class="trow">
+        <span class="tlabel">Published</span>
+        <span class="strip"><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span></span>
+      </div>
+      
+      <div class="trow">
+        <span class="tlabel">Demos</span>
+        <span class="strip"><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span></span>
+      </div>
+      
+      <div class="strip-cap"><span></span><span class="sp"><span>8 weeks ago</span><span>this week</span></span></div>
+      <div class="note">A square fills the week you shipped that input. Replies and offers aren't here — you don't control those, so they're never a chain to break.</div>
+    </div>
+  </section>
+
   <!-- Aware — shipped, not idle -->
   <section class="card">
     <div class="card-head">
@@ -383,6 +423,14 @@
     <div class="card-body">
       
       <div class="row"><span class="key">Workouts this week</span><span class="val" style="color:var(--amber)">0 / 3</span></div>
+      
+      
+      <div class="trow" style="margin-top:12px">
+        <span class="tlabel">3×/week</span>
+        <span class="strip"><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span><span class="sq "></span></span>
+      </div>
+      <div class="strip-cap"><span></span><span class="sp"><span>8 weeks ago</span><span>this week</span></span></div>
+      <div class="note">Filled = hit 3×, faded = some. From your Body &amp; Mind calendar — a trend to read, not a streak to defend.</div>
       
       
         <div class="cta">Steps, sleep & resting HR aren't flowing yet.<br>Set up the Apple Watch → iCloud Shortcut to write <code>health-history.jsonl</code> and they land here automatically. (Workouts above come from your Body &amp; Mind calendar.)</div>

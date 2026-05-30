@@ -35,6 +35,17 @@ TODAY     = NOW.date()
 WEEK_START = TODAY - timedelta(days=6)          # 7-day rolling window, incl. today
 
 
+def week_windows(n=8):
+    """n consecutive 7-day windows, oldest→newest, the last ending today."""
+    return [(TODAY - timedelta(days=7 * k + 6), TODAY - timedelta(days=7 * k))
+            for k in range(n - 1, -1, -1)]
+
+
+def cells_for(dates, windows):
+    """1 if at least one date falls in the window, else 0 (controllable inputs)."""
+    return [1 if any(d and s <= d <= e for d in dates) else 0 for (s, e) in windows]
+
+
 # ── Small parsers ───────────────────────────────────────────────────
 def in_week(d):
     return d is not None and WEEK_START <= d <= TODAY
@@ -181,6 +192,7 @@ def load_outreach():
         "replied_total": len(reply_dates),
         "sent_week": sum(1 for x in sent_dates if in_week(x)),
         "replied_week": sum(1 for x in reply_dates if in_week(x)),
+        "sent_dates": sent_dates,
         "people": people[:6],
         "next_to_send": next_to_send,
     }
@@ -223,6 +235,7 @@ def load_published():
         "recent": [{"title": i["title"][:90],
                     "date": i["date"].isoformat()} for i in items[:4]],
         "draft_waiting": drafted_total > len(items),
+        "dates": [i["date"] for i in items],
         "note": "Drafts aren't posts — published counts only what you actually "
                 "published (published.log or a Published: line).",
     }
@@ -233,12 +246,14 @@ def load_applications():
     rows = read_jsonl(CAREER / "applications.jsonl")
     order = ["submitted", "screen", "interview", "offer", "rejected"]
     by_status = {s: 0 for s in order}
-    recent = []
+    recent, dates = [], []
     week = 0
     for r in rows:
         st = (r.get("status") or "submitted").lower()
         by_status[st] = by_status.get(st, 0) + 1
         d = parse_iso(str(r.get("date", "")))
+        if d:
+            dates.append(d)
         if in_week(d):
             week += 1
         recent.append({"company": r.get("company", "—"),
@@ -249,7 +264,7 @@ def load_applications():
     recent.sort(key=lambda x: x["date"], reverse=True)
     active = sum(by_status.get(s, 0) for s in ("submitted", "screen", "interview", "offer"))
     return {"total": len(rows), "week": week, "active": active,
-            "by_status": by_status, "recent": recent[:5]}
+            "by_status": by_status, "recent": recent[:5], "dates": dates}
 
 
 # ── Demos shipped ───────────────────────────────────────────────────
@@ -265,6 +280,7 @@ def load_demos():
     items.sort(key=lambda x: x["_d"] or date.min, reverse=True)
     return {"total": len(items),
             "week": sum(1 for i in items if in_week(i["_d"])),
+            "dates": [i["_d"] for i in items if i["_d"]],
             "rows": [{k: v for k, v in i.items() if k != "_d"} for i in items[:4]]}
 
 
@@ -494,6 +510,16 @@ def load_health():
             "avg_steps": int(sum(d.get("steps", 0) for d in last7) / len(last7)),
             "avg_sleep": round(sum(d.get("sleep_hours", 0) for d in last7) / len(last7), 1),
         })
+
+    # 8-week workout cadence strip, aligned to the same windows as the career strips.
+    by_end = {w.get("end"): w.get("count", 0) for w in cal.get("weeks", [])}
+    goal = out["goal"]
+    weeks = []
+    for (s, e) in week_windows(8):
+        cnt = by_end.get(e.isoformat(), 0)
+        level = "full" if cnt >= goal else ("part" if cnt > 0 else "")
+        weeks.append({"count": cnt, "level": level})
+    out["workout_weeks"] = weeks
     return out
 
 
@@ -544,6 +570,18 @@ def main():
     action = next_action(outreach, apps, published, demos, targets)
     week_label = f"{WEEK_START.strftime('%b %d')} – {TODAY.strftime('%b %d')}"
 
+    # 8-week cadence strips — controllable INPUTS only (never replies/offers).
+    wins = week_windows(8)
+    trends = {
+        "career": [
+            {"name": "Sent", "cells": cells_for(outreach["sent_dates"], wins)},
+            {"name": "Applied", "cells": cells_for(apps["dates"], wins)},
+            {"name": "Published", "cells": cells_for(published["dates"], wins)},
+            {"name": "Demos", "cells": cells_for(demos["dates"], wins)},
+        ],
+        "workouts": health["workout_weeks"],
+    }
+
     env = Environment(loader=FileSystemLoader(str(REPO)), autoescape=True)
     html = env.get_template("template.html").render(
         generated=NOW.strftime("%B %d, %Y · %I:%M %p"),
@@ -551,6 +589,7 @@ def main():
         hero=hero, action=action,
         outreach=outreach, published=published, apps=apps, demos=demos,
         aware=aware, targets=targets, family=family, friends=friends, health=health,
+        trends=trends,
     )
     OUTPUT.write_text(html)
 
