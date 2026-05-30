@@ -116,7 +116,7 @@
 
 <div class="header">
   <h1>Conversion Dashboard</h1>
-  <div class="sub">May 30, 2026 · 11:21 AM</div>
+  <div class="sub">May 30, 2026 · 04:07 PM</div>
 </div>
 
 <!-- HERO: this week's conversion -->
@@ -126,7 +126,7 @@
     <div class="hero-cell"><div class="n off">0</div><div class="l">Sent</div></div>
     <div class="hero-cell"><div class="n off">0</div><div class="l">Applied</div></div>
     <div class="hero-cell"><div class="n off">0</div><div class="l">Replies</div></div>
-    <div class="hero-cell"><div class="n on">2</div><div class="l">Published</div></div>
+    <div class="hero-cell"><div class="n off">0</div><div class="l">Published</div></div>
     <div class="hero-cell"><div class="n off">0</div><div class="l">Demos</div></div>
   </div>
 </div>
@@ -184,29 +184,21 @@
     </div>
   </section>
 
-  <!-- Published -->
+  <!-- Published: drafts written vs posts actually published -->
   <section class="card">
     <div class="card-head">
       <h2><span class="dot purple"></span> Published</h2>
-      <span class="pill-stat"><span class="big">7</span><span class="l" style="color:var(--text-dim);font-size:.78rem">total</span></span>
+      <span class="pill-stat"><span class="big">0</span><span class="l" style="color:var(--text-dim);font-size:.78rem">published</span></span>
     </div>
     <div class="card-body">
+      <div class="funnel" style="grid-template-columns:1fr 1fr">
+        <div class="fcell"><div class="n">8</div><div class="l">Drafted</div></div>
+        <div class="fcell lead"><div class="n">0</div><div class="l">Published</div></div>
+      </div>
       
-        <div class="row"><span class="key">This week</span><span class="val">2 published</span></div>
-        
-        <div class="listitem">LinkedIn Draft — 2026-05-28<div class="meta">2026-05-28</div></div>
-        
-        <div class="listitem">LinkedIn Draft — 2026-05-25<div class="meta">2026-05-25</div></div>
-        
-        <div class="listitem">LinkedIn Draft — 2026-05-21<div class="meta">2026-05-21</div></div>
-        
-        <div class="listitem">LinkedIn Draft — 2026-05-18<div class="meta">2026-05-18</div></div>
-        
+        <div class="sub">8 posts written and waiting — none published yet. Drafts aren't posts. Log a real publish in <code>LinkedIn/published.log</code> (or add a <code>Published:</code> line to the draft).</div>
       
-      
-      <div class="sub">📝 A draft is waiting in <code>current-draft.md</code> — publish to count it.</div>
-      
-      <div class="note">LinkedIn/archive = published</div>
+      <div class="note">Drafts aren&#39;t posts — published counts only what you actually published (published.log or a Published: line).</div>
     </div>
   </section>
 

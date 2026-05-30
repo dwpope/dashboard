@@ -183,23 +183,24 @@
     </div>
   </section>
 
-  <!-- Published -->
+  <!-- Published: drafts written vs posts actually published -->
   <section class="card">
     <div class="card-head">
       <h2><span class="dot purple"></span> Published</h2>
-      <span class="pill-stat"><span class="big">{{ published.total }}</span><span class="l" style="color:var(--text-dim);font-size:.78rem">total</span></span>
+      <span class="pill-stat"><span class="big">{{ published.total }}</span><span class="l" style="color:var(--text-dim);font-size:.78rem">published</span></span>
     </div>
     <div class="card-body">
+      <div class="funnel" style="grid-template-columns:1fr 1fr">
+        <div class="fcell"><div class="n">{{ published.drafted }}</div><div class="l">Drafted</div></div>
+        <div class="fcell lead"><div class="n">{{ published.total }}</div><div class="l">Published</div></div>
+      </div>
       {% if published.latest %}
         <div class="row"><span class="key">This week</span><span class="val">{{ published.week }} published</span></div>
         {% for i in published.recent %}
         <div class="listitem">{{ i.title }}<div class="meta">{{ i.date }}</div></div>
         {% endfor %}
       {% else %}
-        <div class="empty">No published posts found.</div>
-      {% endif %}
-      {% if published.draft_waiting %}
-      <div class="sub">📝 A draft is waiting in <code>current-draft.md</code> — publish to count it.</div>
+        <div class="sub">{{ published.drafted }} posts written and waiting — none published yet. Drafts aren't posts. Log a real publish in <code>LinkedIn/published.log</code> (or add a <code>Published:</code> line to the draft).</div>
       {% endif %}
       <div class="note">{{ published.note }}</div>
     </div>

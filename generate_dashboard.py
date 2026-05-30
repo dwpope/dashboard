@@ -186,33 +186,45 @@ def load_outreach():
     }
 
 
-# ── Published posts ─────────────────────────────────────────────────
+# ── Published posts (drafts are NOT posts — published = you hit publish) ─
 def load_published():
-    override = LINKEDIN / "published.log"
-    items = []
-    if override.exists():
-        for r in read_log(override):
-            items.append({"title": r["a"] or "Untitled", "date": r["date"]})
-        note = "from published.log"
-    else:
-        for p in sorted(LINKEDIN.glob("archive/*.md")):
-            txt = p.read_text(errors="ignore")
-            title = first_match(txt, r"#\s*(.+)", default=p.stem)
-            d = date_from_name(p) or parse_iso(first_match(txt, r"(\d{4}-\d{2}-\d{2})"))
-            items.append({"title": title, "date": d})
-        note = "LinkedIn/archive = published"
+    draft_files = sorted(LINKEDIN.glob("archive/*.md"))
+    cur = LINKEDIN / "current-draft.md"
+    if cur.exists():
+        draft_files.append(cur)
+    drafted_total = len(draft_files)
 
-    items = [i for i in items if i["date"]]
-    items.sort(key=lambda x: x["date"], reverse=True)
-    has_draft = (LINKEDIN / "current-draft.md").exists()
+    # Published counts ONLY an explicit "I hit publish" signal: a line in
+    # published.log, or a `Published: YYYY-MM-DD` marker inside the draft.
+    items = []
+    for r in read_log(LINKEDIN / "published.log"):
+        items.append({"title": r["a"] or "Untitled", "date": r["date"]})
+    for p in draft_files:
+        txt = p.read_text(errors="ignore")
+        pub = parse_iso(first_match(txt, r"Published:\s*(\d{4}-\d{2}-\d{2})"))
+        if pub:
+            items.append({"title": first_match(txt, r"#\s*(.+)", default=p.stem),
+                          "date": pub})
+
+    seen, dedup = set(), []
+    for it in sorted([i for i in items if i["date"]],
+                     key=lambda x: x["date"], reverse=True):
+        k = (it["title"][:40].lower(), it["date"])
+        if k not in seen:
+            seen.add(k)
+            dedup.append(it)
+    items = dedup
+
     return {
+        "drafted": drafted_total,
         "total": len(items),
         "week": sum(1 for i in items if in_week(i["date"])),
         "latest": items[0] if items else None,
         "recent": [{"title": i["title"][:90],
                     "date": i["date"].isoformat()} for i in items[:4]],
-        "draft_waiting": has_draft,
-        "note": note,
+        "draft_waiting": drafted_total > len(items),
+        "note": "Drafts aren't posts — published counts only what you actually "
+                "published (published.log or a Published: line).",
     }
 
 
