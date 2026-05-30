@@ -1,0 +1,7 @@
+# Local dev / agent artifacts — not part of the deployed site
+.playwright-mcp/
+*.png
+.run-session-a.sh
+SESSION-A-conversion-tracker.md
+.claude/
+.DS_Store

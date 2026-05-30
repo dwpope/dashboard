@@ -3,347 +3,364 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Dave's Life Dashboard</title>
+<meta name="color-scheme" content="dark">
+<title>Dave's Conversion Dashboard</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#0d1117;--card:#161b22;--border:#30363d;
-    --text:#e6edf3;--text-dim:#8b949e;
-    --green:#3fb950;--amber:#d29922;--red:#f85149;--accent:#58a6ff;
-    --purple:#bc8cff;
-    --radius:12px;
+    --bg:#000;--card:#1c1c1e;--card-2:#2c2c2e;
+    --separator:rgba(84,84,88,.55);
+    --text:#fff;--text-dim:#98989f;
+    --green:#30d158;--amber:#ff9f0a;--accent:#0a84ff;--purple:#bf5af3;--teal:#64d2ff;
+    --radius:18px;--radius-sm:12px;
   }
-  html{font-size:16px;-webkit-text-size-adjust:100%}
+  html{font-size:17px;-webkit-text-size-adjust:100%}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
-    background:var(--bg);color:var(--text);
-    line-height:1.55;padding:16px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.47;padding:16px;
     padding-top:max(16px,env(safe-area-inset-top));
-    padding-bottom:80px;max-width:640px;margin:0 auto;
-    -webkit-font-smoothing:antialiased;
+    padding-bottom:max(40px,env(safe-area-inset-bottom));
+    max-width:640px;margin:0 auto;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;
   }
+  .header{padding:18px 4px 2px}
+  .header h1{font-size:2.05rem;font-weight:700;letter-spacing:-.035em;line-height:1.1}
+  .header .sub{font-size:.9rem;color:var(--text-dim);margin-top:3px;font-weight:400;letter-spacing:0}
 
-  .header{text-align:center;padding:28px 0 8px}
-  .header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
-  .header .sub{font-size:.75rem;color:var(--text-dim);margin-top:4px}
-
-  /* Pillar tabs */
-  .pillar-nav{display:flex;gap:6px;margin:18px 0 14px;justify-content:center}
-  .pillar-tab{
-    padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:600;
-    cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);
-    transition:all .2s ease;-webkit-tap-highlight-color:transparent;
+  /* Hero conversion strip */
+  .hero{
+    background:linear-gradient(160deg,#1f1f22,#161618);
+    border:.5px solid var(--separator);border-radius:var(--radius);
+    padding:16px 14px 14px;margin:16px 0 14px;
   }
-  .pillar-tab.active{color:var(--text);border-color:var(--accent);background:rgba(88,166,255,.1)}
-  .pillar-tab:active{transform:scale(.96)}
+  .hero .eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+  .hero-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .hero-cell{text-align:center;padding:6px 2px}
+  .hero-cell .n{font-size:1.6rem;font-weight:700;letter-spacing:-.04em;line-height:1}
+  .hero-cell .l{font-size:.66rem;color:var(--text-dim);margin-top:5px;font-weight:500;letter-spacing:0}
+  .hero-cell .n.on{color:var(--green)}
+  .hero-cell .n.off{color:var(--text-dim)}
 
+  /* ONE next action */
+  .action{
+    background:linear-gradient(135deg,rgba(10,132,255,.16),rgba(100,210,255,.06));
+    border:.5px solid rgba(10,132,255,.4);border-radius:var(--radius);
+    padding:15px 16px;margin-bottom:18px;
+  }
+  .action .row1{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .action .pin{font-size:1.05rem}
+  .action .tag{font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:rgba(10,132,255,.18);padding:2px 9px;border-radius:20px}
+  .action .text{font-size:1.12rem;font-weight:650;letter-spacing:-.02em;line-height:1.25}
+  .action .why{font-size:.86rem;color:var(--text-dim);margin-top:5px;line-height:1.4}
+  .action.fam{background:linear-gradient(135deg,rgba(191,90,243,.17),rgba(191,90,243,.05));border-color:rgba(191,90,243,.42);margin-bottom:14px}
+  .action.fam .tag{color:var(--purple);background:rgba(191,90,243,.18)}
+
+  /* Presence */
+  .presence{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 2px}
+  .pcell{background:var(--card-2);border-radius:var(--radius-sm);padding:13px 12px;text-align:center}
+  .pcell .n{font-size:1.5rem;font-weight:700;letter-spacing:-.03em}
+  .pcell .n .u{font-size:.85rem;color:var(--text-dim);font-weight:600}
+  .pcell .l{font-size:.7rem;color:var(--text-dim);margin-top:4px;line-height:1.3}
+  .pcell .n.good{color:var(--green)}.pcell .n.mid{color:var(--amber)}
+
+  /* Segmented control */
+  .pillar-nav{display:flex;gap:2px;margin:0 0 16px;background:var(--card);border-radius:11px;padding:2px}
+  .pillar-tab{flex:1;text-align:center;white-space:nowrap;padding:7px 8px;border-radius:9px;font-size:.8rem;font-weight:590;cursor:pointer;border:none;background:transparent;color:var(--text);transition:background .25s ease,box-shadow .25s ease;-webkit-tap-highlight-color:transparent;letter-spacing:-.01em}
+  .pillar-tab.active{background:var(--card-2);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .pillar-tab:active{opacity:.55}
   .pillar{display:none}
-  .pillar.active{display:block}
+  .pillar.active{display:block;animation:fadeIn .25s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-  /* Tiles */
-  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-  .tiles.triple{grid-template-columns:1fr 1fr 1fr}
-  .tile{
-    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-    padding:14px 16px;text-align:center;
-  }
-  .tile .num{font-size:1.4rem;font-weight:700;line-height:1.2}
-  .tile .label{font-size:.68rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
-  .tile.green .num{color:var(--green)}
-  .tile.amber .num{color:var(--amber)}
-  .tile.red .num{color:var(--red)}
-  .tile.accent .num{color:var(--accent)}
+  .card{background:var(--card);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:15px 16px 6px}
+  .card-head h2{font-size:1.05rem;font-weight:600;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+  .card-body{padding:2px 16px 14px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .dot.green{background:var(--green)}.dot.accent{background:var(--accent)}.dot.purple{background:var(--purple)}
 
-  /* Cards */
-  details.card{
-    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-    margin-bottom:12px;overflow:hidden;
-  }
-  details.card>summary{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 16px;cursor:pointer;
-    -webkit-tap-highlight-color:transparent;user-select:none;
-    list-style:none;
-  }
-  details.card>summary::-webkit-details-marker{display:none}
-  details.card>summary::marker{display:none;content:""}
-  details.card>summary h2{font-size:.92rem;font-weight:600;display:flex;align-items:center;gap:8px}
-  details.card>summary .arrow{
-    font-size:.7rem;color:var(--text-dim);display:inline-block;
-    transition:transform .25s ease;transform:rotate(-90deg);
-  }
-  details.card[open]>summary .arrow{transform:rotate(0deg)}
-
-  .card-body{padding:0 16px 16px}
-  .card-inner{animation:cardOpen .3s ease forwards}
-  @keyframes cardOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-
-  /* Dots */
-  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
-  .dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
-  .dot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber)}
-  .dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-  .dot.pulse{animation:pulse 2s ease-in-out infinite}
-
-  /* Rows */
-  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;border-bottom:.5px solid var(--separator);font-size:.95rem}
   .row:last-child{border-bottom:none}
-  .row .key{color:var(--text-dim)}
-  .row .val{font-weight:600;text-align:right}
+  .row .key{color:var(--text-dim);font-weight:400}
+  .row .val{font-weight:550;text-align:right}
 
-  /* Tags */
-  .tag{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
-  .tag.red{background:rgba(248,81,73,.15);color:var(--red)}
-  .tag.green{background:rgba(63,185,80,.15);color:var(--green)}
-  .tag.amber{background:rgba(210,153,34,.15);color:var(--amber)}
-  .tag.accent{background:rgba(88,166,255,.12);color:var(--accent)}
+  /* Funnel */
+  .funnel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 4px}
+  .fcell{background:var(--card-2);border-radius:var(--radius-sm);padding:12px 8px;text-align:center}
+  .fcell .n{font-size:1.5rem;font-weight:700;letter-spacing:-.03em}
+  .fcell .l{font-size:.7rem;color:var(--text-dim);margin-top:3px}
+  .fcell.lead .n{color:var(--green)}
+  .fcell .arrow{position:absolute}
 
-  /* Charts */
-  svg.chart{display:block;width:100%;height:auto;margin:10px 0}
-  .chart-label{font-size:.7rem;color:var(--text-dim);margin-bottom:2px}
+  .tag-s{font-size:.7rem;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0}
+  .tag-s.drafted{background:rgba(152,152,159,.18);color:var(--text-dim)}
+  .tag-s.sent{background:rgba(10,132,255,.18);color:var(--accent)}
+  .tag-s.replied{background:rgba(48,209,88,.18);color:var(--green)}
+  .tag-s.submitted{background:rgba(10,132,255,.18);color:var(--accent)}
+  .tag-s.screen,.tag-s.interview,.tag-s.offer{background:rgba(48,209,88,.18);color:var(--green)}
+  .tag-s.rejected{background:rgba(152,152,159,.16);color:var(--text-dim)}
 
-  /* Progress bar */
-  .progress-track{height:6px;background:var(--border);border-radius:3px;margin:8px 0}
-  .progress-fill{height:100%;border-radius:3px;background:var(--green);transition:width .3s ease}
-
-  /* Action items */
-  .action-item{
-    padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem;
-  }
-  .action-item:last-child{border-bottom:none}
-  .action-item .source{font-size:.7rem;color:var(--text-dim);margin-top:2px}
-
-  .sub{font-size:.78rem;color:var(--text-dim);margin-top:6px;line-height:1.5}
+  .pill-stat{display:inline-flex;align-items:baseline;gap:5px}
+  .pill-stat .big{font-size:1.05rem;font-weight:650}
+  .badge{font-size:.72rem;font-weight:600;color:var(--green);background:rgba(48,209,88,.16);padding:3px 10px;border-radius:20px}
+  .sub{font-size:.86rem;color:var(--text-dim);margin-top:6px;line-height:1.5}
+  .note{font-size:.74rem;color:var(--text-dim);opacity:.8;margin-top:8px;font-style:italic}
   a{color:var(--accent);text-decoration:none}
-
-  /* Empty state */
-  .empty{text-align:center;padding:20px;color:var(--text-dim);font-size:.85rem}
+  .empty{text-align:center;padding:16px 0;color:var(--text-dim);font-size:.9rem}
+  .listitem{padding:10px 0;border-bottom:.5px solid var(--separator);font-size:.93rem}
+  .listitem:last-child{border-bottom:none}
+  .listitem .meta{font-size:.78rem;color:var(--text-dim);margin-top:3px}
+  .cta{display:block;text-align:center;background:var(--card-2);border-radius:var(--radius-sm);padding:14px;font-size:.92rem;color:var(--text-dim);line-height:1.5}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Life Dashboard</h1>
-  <div class="sub">May 29, 2026 · 06:29 PM</div>
+  <h1>Conversion Dashboard</h1>
+  <div class="sub">May 30, 2026 · 11:21 AM</div>
 </div>
 
-<!-- Pillar Navigation -->
+<!-- HERO: this week's conversion -->
+<div class="hero">
+  <div class="eyebrow">This week · May 24 – May 30</div>
+  <div class="hero-grid">
+    <div class="hero-cell"><div class="n off">0</div><div class="l">Sent</div></div>
+    <div class="hero-cell"><div class="n off">0</div><div class="l">Applied</div></div>
+    <div class="hero-cell"><div class="n off">0</div><div class="l">Replies</div></div>
+    <div class="hero-cell"><div class="n on">2</div><div class="l">Published</div></div>
+    <div class="hero-cell"><div class="n off">0</div><div class="l">Demos</div></div>
+  </div>
+</div>
+
+<!-- ONE next action -->
+<div class="action">
+  <div class="row1"><span class="pin">📍</span><span class="tag">Outreach</span></div>
+  <div class="text">Send your connection to Moritz Scherer</div>
+  <div class="why">Drafted 23d ago — still unsent. Hit send today.</div>
+</div>
+
 <div class="pillar-nav">
-  <div class="pillar-tab active" onclick="showPillar('build')">Build</div>
-  <div class="pillar-tab" onclick="showPillar('move')">Move</div>
-  <div class="pillar-tab" onclick="showPillar('thrive')">Thrive</div>
+  <div class="pillar-tab active" onclick="showPillar(event,'career')">Career</div>
+  <div class="pillar-tab" onclick="showPillar(event,'family')">Family</div>
+  <div class="pillar-tab" onclick="showPillar(event,'health')">Health</div>
 </div>
 
-<!-- ════════════════════════════════════════════ -->
-<!-- BUILD PILLAR                                 -->
-<!-- ════════════════════════════════════════════ -->
-<div class="pillar active" id="pillar-build">
+<!-- ════════ CAREER ════════ -->
+<div class="pillar active" id="pillar-career">
 
-  <div class="tiles">
-    <div class="tile red">
-      <div class="num">10</div>
-      <div class="label">Days Idle</div>
-    </div>
-    <div class="tile amber">
-      <div class="num">✗</div>
-      <div class="label">Demo Video</div>
-    </div>
-  </div>
-
-  <!-- Quant/Aware -->
-  <details class="card" open>
-    <summary>
-      <h2><span class="dot red pulse"></span> Quant · Aware</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
-      <div class="row"><span class="key">Next Milestone</span><span class="val">Surface analytics UI in the app</span></div>
-      <div class="row"><span class="key">Days Since Progress</span><span class="val" style="color:var(--red)">10</span></div>
-      <div class="row"><span class="key">Demo Video</span><span class="val"><span class="tag amber">Pending</span></span></div>
-      
-      <div class="row"><span class="key">CI Status</span><span class="val">unknown</span></div>
-      
-    </div></div>
-  </details>
-
-  <!-- Code Tutor -->
-  <details class="card">
-    <summary>
-      <h2><span class="dot green"></span> Code Tutor</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
-      <div class="row"><span class="key">Days Since Session</span><span class="val" style="color:var(--green)">0</span></div>
-      <div class="row"><span class="key">Weakest Area</span><span class="val">testing</span></div>
-      <div class="sub">Keep the streak alive — quiz yourself on the Quant codebase.</div>
-    </div></div>
-  </details>
-</div>
-
-<!-- ════════════════════════════════════════════ -->
-<!-- MOVE PILLAR                                  -->
-<!-- ════════════════════════════════════════════ -->
-<div class="pillar" id="pillar-move">
-
-  <div class="tiles">
-    <div class="tile accent">
-      <div class="num">0/10</div>
-      <div class="label">Outreach</div>
-    </div>
-    <div class="tile amber">
-      <div class="num">0</div>
-      <div class="label">Action Items</div>
-    </div>
-  </div>
-
-  <!-- Outreach tracker -->
-  <details class="card" open>
-    <summary>
-      <h2>Outreach Progress</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
-      <div class="chart-label">0 of 10 connections made</div>
-      <div class="progress-track">
-        <div class="progress-fill" style="width:0%"></div>
+  <!-- Outreach funnel -->
+  <section class="card">
+    <div class="card-head"><h2><span class="dot accent"></span> Outreach</h2></div>
+    <div class="card-body">
+      <div class="funnel">
+        <div class="fcell"><div class="n">4</div><div class="l">Drafted</div></div>
+        <div class="fcell lead"><div class="n">0</div><div class="l">Sent</div></div>
+        <div class="fcell lead"><div class="n">0</div><div class="l">Replied</div></div>
       </div>
       
-        <div class="sub">No connections logged yet. Start adding people to track progress.</div>
+      <div class="sub">4 connections written and waiting. None sent yet — that's the gap this dashboard tracks. Log a send in <code>Outreach/sent.log</code>.</div>
       
-    </div></div>
-  </details>
+      
+      <div class="row"><span class="key">Sukemasa Masa Kabayama</span><span class="val"><span class="tag-s drafted">drafted</span></span></div>
+      
+      <div class="row"><span class="key">Cheng Zhang</span><span class="val"><span class="tag-s drafted">drafted</span></span></div>
+      
+      <div class="row"><span class="key">Theodore Wohng</span><span class="val"><span class="tag-s drafted">drafted</span></span></div>
+      
+      <div class="row"><span class="key">Moritz Scherer</span><span class="val"><span class="tag-s drafted">drafted</span></span></div>
+      
+    </div>
+  </section>
 
-  <!-- Career Intel -->
-  <details class="card" >
-    <summary>
-      <h2>Career Intel</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
+  <!-- Applications -->
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="dot accent"></span> Applications</h2>
+      <span class="pill-stat"><span class="big">0</span><span class="l" style="color:var(--text-dim);font-size:.78rem">active</span></span>
+    </div>
+    <div class="card-body">
       
-        <div class="empty">No actionable intel this week. Check back Monday.</div>
+        <div class="empty">No applications logged yet. Append one line to <code>applications.jsonl</code> when you submit.</div>
       
-    </div></div>
-  </details>
+    </div>
+  </section>
+
+  <!-- Published -->
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="dot purple"></span> Published</h2>
+      <span class="pill-stat"><span class="big">7</span><span class="l" style="color:var(--text-dim);font-size:.78rem">total</span></span>
+    </div>
+    <div class="card-body">
+      
+        <div class="row"><span class="key">This week</span><span class="val">2 published</span></div>
+        
+        <div class="listitem">LinkedIn Draft — 2026-05-28<div class="meta">2026-05-28</div></div>
+        
+        <div class="listitem">LinkedIn Draft — 2026-05-25<div class="meta">2026-05-25</div></div>
+        
+        <div class="listitem">LinkedIn Draft — 2026-05-21<div class="meta">2026-05-21</div></div>
+        
+        <div class="listitem">LinkedIn Draft — 2026-05-18<div class="meta">2026-05-18</div></div>
+        
+      
+      
+      <div class="sub">📝 A draft is waiting in <code>current-draft.md</code> — publish to count it.</div>
+      
+      <div class="note">LinkedIn/archive = published</div>
+    </div>
+  </section>
+
+  <!-- Demos -->
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="dot green"></span> Demos shipped</h2>
+      <span class="pill-stat"><span class="big">0</span><span class="l" style="color:var(--text-dim);font-size:.78rem">total</span></span>
+    </div>
+    <div class="card-body">
+      
+        <div class="empty">No demos shipped yet. A 60-sec video beats a week of commits. Log it in <code>demos.jsonl</code>.</div>
+      
+    </div>
+  </section>
+
+  <!-- Aware — shipped, not idle -->
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="dot green"></span> Aware</h2>
+      <span class="badge">In TestFlight</span>
+    </div>
+    <div class="card-body">
+      <div class="row"><span class="key">Tests</span><span class="val">689 · 41K LOC</span></div>
+      <div class="row"><span class="key">Commits</span><span class="val">221</span></div>
+      <div class="row"><span class="key">Last shipped</span><span class="val">May 19 · 11d ago</span></div>
+      <div class="sub">feat(debug): add per-channel isolation switches and dev-notes overlay for posture visualization tuning</div>
+    </div>
+  </section>
+
+  <!-- Target roles -->
+  
+  <section class="card">
+    <div class="card-head"><h2>Live targets</h2></div>
+    <div class="card-body">
+      
+      <div class="listitem"><a href="https://jobs.disneycareers.com/job/santa-monica/principal-product-designer-ar-vr-xr/391/88268125376">Disney ↗</a><div class="meta">Principal Product Designer, Emerging Experiences (XR/VR) | · $167,700–$224,900 (Santa Monica) / $183,700–$246,400 (SF) |</div></div>
+      
+      <div class="listitem"><a href="https://www.metacareers.com/v2/jobs/1648347312348701/">Meta ↗</a><div class="meta">Product Designer, Reality Labs | · $170K–$236K base |</div></div>
+      
+      <div class="listitem"><a href="https://www.google.com/about/careers/applications/jobs/results/79414278116778694-senior-visual-designer/">Google ↗</a><div class="meta">Senior Visual Designer, Android XR | · Est. $160K–$240K (Google L5/L6 design band) |</div></div>
+      
+      <div class="listitem"><a href="https://careers.snap.com/jobs">Snap ↗</a><div class="meta">Design Engineer, Spectacles | · $157,000–$235,000 |</div></div>
+      
+    </div>
+  </section>
+  
 </div>
 
-<!-- ════════════════════════════════════════════ -->
-<!-- THRIVE PILLAR                                -->
-<!-- ════════════════════════════════════════════ -->
-<div class="pillar" id="pillar-thrive">
+<!-- ════════ FAMILY ════════ -->
+<div class="pillar" id="pillar-family">
 
-  <div class="tiles triple">
-    <div class="tile amber">
-      <div class="num">—</div>
-      <div class="label">Steps</div>
-    </div>
-    <div class="tile amber">
-      <div class="num">—</div>
-      <div class="label">Sleep (h)</div>
-    </div>
-    <div class="tile red">
-      <div class="num">0d</div>
-      <div class="label">Protein &#x1F525;</div>
-    </div>
+  <!-- ONE family action (presence-first) -->
+  
+  <div class="action fam">
+    <div class="row1"><span class="pin">💜</span><span class="tag">Tonight</span></div>
+    <div class="text">Rachel has Adele 6–11pm — take Jena out.</div>
+    <div class="why">10 weeks since your last (Sushinoen with Jena, Mar 15). Phone in the drawer — be there for it.</div>
   </div>
-
-  <!-- Health Vitals -->
-  <details class="card" open>
-    <summary>
-      <h2>Health Vitals</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
-      <div class="row"><span class="key">Resting HR</span><span class="val">— bpm</span></div>
-      <div class="row"><span class="key">HRV</span><span class="val">— ms</span></div>
-      <div class="row"><span class="key">VO2max</span><span class="val">—</span></div>
-      
-      <div style="margin-top:10px">
-        <div class="chart-label">7-Day Averages</div>
-        <div class="row"><span class="key">Avg Steps</span><span class="val">—</span></div>
-        <div class="row"><span class="key">Avg Sleep</span><span class="val">—h</span></div>
-      </div>
-    </div></div>
-  </details>
-
-  <!-- Streaks -->
-  <details class="card">
-    <summary>
-      <h2>Streaks</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
-      <div class="row"><span class="key">7K+ Steps</span><span class="val">0d</span></div>
-      <div class="row"><span class="key">7h+ Sleep</span><span class="val">0d</span></div>
-      <div class="row"><span class="key">Workouts</span><span class="val">0d</span></div>
-      <div class="row"><span class="key">Protein All Meals</span><span class="val">0d</span></div>
-    </div></div>
-  </details>
-
-  <!-- Steps sparkline -->
   
 
-  <!-- Family -->
-  <details class="card">
-    <summary>
-      <h2>Family</h2>
-      <span class="arrow">&#9654;</span>
-    </summary>
-    <div class="card-body"><div class="card-inner">
+  <!-- Presence — the point isn't the hours, it's being there for them -->
+  <section class="card">
+    <div class="card-head"><h2><span class="dot purple"></span> Presence</h2></div>
+    <div class="card-body">
+      
+        <div class="cta">Presence isn't tracked yet.<br>The point isn't logging more hours — it's being there for the ones you've got. Once set up: your rating, <b>Jena's rating</b>, and phone-down time become your mirror.</div>
+      
+    </div>
+  </section>
+
+  <!-- Togetherness: weeks since, not a streak to grind -->
+  
+  <section class="card">
+    <div class="card-head"><h2>Togetherness</h2></div>
+    <div class="card-body">
+      
+      <div class="row"><span class="key">Last date night</span><span class="val">Sushinoen with Jena · 10w ago</span></div>
       
       
+      <div class="row"><span class="key">Adele 1:1</span><span class="val">Nothing dedicated logged</span></div>
+      
+    </div>
+  </section>
+  
+
+  <!-- Friendships: keep the circle warm -->
+  <section class="card">
+    <div class="card-head">
+      <h2><span class="dot accent"></span> Friendships</h2>
+      <span class="pill-stat"><span class="big">0</span><span style="color:var(--text-dim);font-size:.78rem">/ 3 warm</span></span>
+    </div>
+    <div class="card-body">
       
       
-      <div class="empty">Family data will appear once the check-in shortcut is used.</div>
+        
+        <div class="row"><span class="key">Tom McGee&#39;s birthday</span><span class="val"><span class="tag-s sent">say happy birthday</span></span></div>
+        
+        <div class="row"><span class="key">Mum&#39;s birthday</span><span class="val"><span class="tag-s sent">say happy birthday</span></span></div>
+        
       
-    </div></div>
-  </details>
+      
+        <div class="sub">3 friends awaiting a first logged contact to start the clock.</div>
+      
+    </div>
+  </section>
+
+  <!-- Upcoming so nothing sneaks up -->
+  
+  <section class="card">
+    <div class="card-head"><h2>Next 7 days</h2></div>
+    <div class="card-body">
+      
+      <div class="row"><span class="key">Tomorrow</span><span class="val">Buy flowers for Jo</span></div>
+      
+      <div class="row"><span class="key">Fri</span><span class="val">Tom McGee&#39;s birthday <span class="tag-s drafted">birthday</span></span></div>
+      
+      <div class="row"><span class="key">Jun 06</span><span class="val">Mum&#39;s birthday <span class="tag-s drafted">birthday</span></span></div>
+      
+    </div>
+  </section>
+  
+
+  <!-- Today's idea (demoted below the real signal) -->
+  
+  <section class="card">
+    <div class="card-head"><h2>Today's idea · Adele</h2></div>
+    <div class="card-body">
+      <div class="sub" style="font-size:.95rem;color:var(--text)">It&#39;s a hot one, so take Adele to run through the choreographed water fountains at Queen Elizabeth Olympic Park (by the Aquatics Centre). The jets pop up and disappear, which is exactly the kind of cause-and-effect, repetitive sensory play a 3-year-old will happily do for ages, and squealing through water with you is the whole point. Pack a towel and a change of clothes.</div>
+      <div class="sub">☀️ Warm, dry and sunny, around 28-29°C with light winds. Perfect for outdoor water play; just bring sun hats and water.</div>
+    </div>
+  </section>
+  
 </div>
 
-<!-- ════════════════════════════════════════════ -->
-<!-- JavaScript                                   -->
-<!-- ════════════════════════════════════════════ -->
+<!-- ════════ HEALTH ════════ -->
+<div class="pillar" id="pillar-health">
+  <section class="card">
+    <div class="card-head"><h2><span class="dot green"></span> Health</h2></div>
+    <div class="card-body">
+      
+        <div class="cta">No health data flowing yet.<br>Set up the Apple Watch → iCloud Shortcut to write <code>health-history.jsonl</code>, and steps / sleep / HR land here automatically.</div>
+      
+    </div>
+  </section>
+</div>
+
 <script>
-function showPillar(id) {
-  document.querySelectorAll('.pillar').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('pillar-' + id).classList.add('active');
-  event.target.classList.add('active');
+function showPillar(e,id){
+  document.querySelectorAll('.pillar').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.pillar-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pillar-'+id).classList.add('active');
+  e.currentTarget.classList.add('active');
 }
-
-// Sparkline renderer
-function drawSparkline(svgId, data, color) {
-  var svg = document.getElementById(svgId);
-  if (!svg || !data.length) return;
-  var w=300, h=80, pad=6;
-  var min=Math.min.apply(null,data), max=Math.max.apply(null,data);
-  var range=max-min||1;
-  var pts=[];
-  for(var i=0;i<data.length;i++){
-    var x=pad+(i/(data.length-1))*(w-pad*2);
-    var y=h-pad-((data[i]-min)/range)*(h-pad*2);
-    pts.push(x+','+y);
-  }
-  var defs='<defs><linearGradient id="sg-'+svgId+'" x1="0" y1="0" x2="0" y2="1">'+
-    '<stop offset="0%" stop-color="'+color+'" stop-opacity="0.3"/>'+
-    '<stop offset="100%" stop-color="'+color+'" stop-opacity="0.02"/>'+
-    '</linearGradient></defs>';
-  var area='M'+pts[0]+' '+pts.join(' L')+
-    ' L'+(pad+(w-pad*2))+','+(h-pad)+' L'+pad+','+(h-pad)+' Z';
-  var line='M'+pts.join(' L');
-  var dots='';
-  for(var j=0;j<pts.length;j++){
-    var c=pts[j].split(',');
-    var r=j===pts.length-1?3.5:2;
-    dots+='<circle cx="'+c[0]+'" cy="'+c[1]+'" r="'+r+'" fill="'+color+'" opacity="'+(j===pts.length-1?1:0.5)+'"/>';
-  }
-  svg.innerHTML=defs+'<path d="'+area+'" fill="url(#sg-'+svgId+')"/>'+
-    '<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2"/>'+dots;
-}
-
-var stepsData = [];
-drawSparkline('steps-spark', stepsData, '#3fb950');
 </script>
 </body>
 </html>
